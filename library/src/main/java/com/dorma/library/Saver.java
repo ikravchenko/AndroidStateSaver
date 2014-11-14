@@ -32,6 +32,9 @@ public class Saver {
     }
 
     public static void restore(Activity activity, Bundle inState) {
+        if (inState == null) {
+            return;
+        }
         try {
             Class<?> clazz = activity.getClass();
             Field[] declaredFields = clazz.getDeclaredFields();
