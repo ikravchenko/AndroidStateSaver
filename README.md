@@ -9,7 +9,7 @@ throws RuntimeException when trying to save final fields.
  
 Example usage:
 
-        public class MainActivity extends Activity {
+    public class MainActivity extends Activity {
 
         @SaveState
         SimpleObject simpleObject;
@@ -36,7 +36,9 @@ Example usage:
             super.onSaveInstanceState(outState);
             new Saver().save(this, outState);
         }
- 
+    }
+    
+    
  Possible improvements:
  1. {@link android.os.Bundle} size restriction according to OS params
  2. code generation during compile phase
