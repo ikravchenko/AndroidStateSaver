@@ -14,7 +14,9 @@ import java.util.UUID;
 
 public class DefaultSaver implements Saver<Object> {
 
-    private static final HashMap<String, String> id2Name = new HashMap<String, String>();
+    private static final String SAVED_OBJECTS_MAPPING_KEY = "SAVED_OBJECTS_MAPPING";
+
+    private HashMap<String, String> id2Name = new HashMap<String, String>();
 
     public void save(Object object, Bundle outState) {
         if (object == null) {
@@ -46,9 +48,14 @@ public class DefaultSaver implements Saver<Object> {
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } finally {
+            if (!id2Name.isEmpty()) {
+                outState.putSerializable(SAVED_OBJECTS_MAPPING_KEY, id2Name);
+            }
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void restore(Object object, Bundle inState) {
         if (object == null) {
             throw new RuntimeException("Object should not be null!");
@@ -56,6 +63,13 @@ public class DefaultSaver implements Saver<Object> {
         if (inState == null) {
             return;
         }
+
+        if (!inState.containsKey(SAVED_OBJECTS_MAPPING_KEY)) {
+            Log.i("Saver", "nothing was saved");
+            return;
+        }
+
+        id2Name = (HashMap<String, String>) inState.getSerializable(SAVED_OBJECTS_MAPPING_KEY);
 
         try {
             Class<?> clazz = object.getClass();
