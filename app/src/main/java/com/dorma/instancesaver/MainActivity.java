@@ -11,8 +11,10 @@ import com.dorma.library.Saver;
 
 public class MainActivity extends Activity {
 
-    @SaveState(id = "someID")
+    @SaveState
     private String text = "";
+    @SaveState
+    public SimpleObject simpleObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
