@@ -2,6 +2,8 @@ package com.ikravchenko.library;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -16,11 +18,12 @@ public class DefaultSaver implements Saver<Object> {
 
     public void save(Object object, Bundle outState) {
         if (object == null) {
-            throw new RuntimeException("Activity should not be null!");
+            throw new RuntimeException("Object should not be null!");
         }
         if (outState == null) {
             throw new RuntimeException("outState bundle should not be empty!");
         }
+        Log.i("DefaultInstanceSaver", "Size: " + id2Name.size() + ", class: " + object.getClass().getSimpleName() + " " + TextUtils.join("; ",  id2Name.entrySet()));
         id2Name.clear();
         try {
             Class<?> clazz = object.getClass();
@@ -48,7 +51,7 @@ public class DefaultSaver implements Saver<Object> {
 
     public void restore(Object object, Bundle inState) {
         if (object == null) {
-            throw new RuntimeException("Activity should not be null!");
+            throw new RuntimeException("Object should not be null!");
         }
         if (inState == null) {
             return;
@@ -59,6 +62,7 @@ public class DefaultSaver implements Saver<Object> {
             for (Map.Entry<String, String> savedEntry : id2Name.entrySet()) {
                 try {
                     Field declaredField = clazz.getDeclaredField(savedEntry.getValue());
+                    declaredField.setAccessible(true);
                     declaredField.set(object, inState.get(savedEntry.getKey()));
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();

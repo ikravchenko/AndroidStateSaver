@@ -11,6 +11,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.ikravchenko.instancesaver.MultipleFragmentsActivity" />
+        <activity android:name=".AttachableFragmentsActivity" />
 
     </application>
 

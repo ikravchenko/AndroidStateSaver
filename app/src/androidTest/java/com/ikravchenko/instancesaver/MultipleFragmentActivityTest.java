@@ -13,7 +13,7 @@ public class MultipleFragmentActivityTest extends ActivityInstrumentationTestCas
     }
 
     @UiThreadTest
-    public void testShouldSaveFragmentStates() {
+    public void testShouldSaveActivityAndFragmentStates() {
         getActivity();
         SimpleObject activityObject = new SimpleObject(100, 100, 100.0);
         getActivity().simpleObject = activityObject;
