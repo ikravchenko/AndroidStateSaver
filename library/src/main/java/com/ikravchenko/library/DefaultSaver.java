@@ -1,6 +1,5 @@
-package com.dorma.library;
+package com.ikravchenko.library;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
 
@@ -11,13 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Saver {
+public class DefaultSaver implements Saver<Object> {
 
     private static final HashMap<String, String> id2Name = new HashMap<String, String>();
 
-
-    public static void save(Activity activity, Bundle outState) {
-        if (activity == null) {
+    public void save(Object object, Bundle outState) {
+        if (object == null) {
             throw new RuntimeException("Activity should not be null!");
         }
         if (outState == null) {
@@ -25,7 +23,7 @@ public class Saver {
         }
         id2Name.clear();
         try {
-            Class<?> clazz = activity.getClass();
+            Class<?> clazz = object.getClass();
             Field[] declaredFields = clazz.getDeclaredFields();
             for (Field field : declaredFields) {
                 if (field.isAnnotationPresent(SaveState.class)) {
@@ -35,7 +33,7 @@ public class Saver {
                     field.setAccessible(true);
                     String id = UUID.randomUUID().toString();
                     id2Name.put(id, field.getName());
-                    Object value = field.get(activity);
+                    Object value = field.get(object);
                     if (value instanceof Parcelable) {
                         outState.putParcelable(id, (Parcelable) value);
                     } else if (value instanceof Serializable) {
@@ -48,8 +46,8 @@ public class Saver {
         }
     }
 
-    public static void restore(Activity activity, Bundle inState) {
-        if (activity == null) {
+    public void restore(Object object, Bundle inState) {
+        if (object == null) {
             throw new RuntimeException("Activity should not be null!");
         }
         if (inState == null) {
@@ -57,11 +55,11 @@ public class Saver {
         }
 
         try {
-            Class<?> clazz = activity.getClass();
+            Class<?> clazz = object.getClass();
             for (Map.Entry<String, String> savedEntry : id2Name.entrySet()) {
                 try {
                     Field declaredField = clazz.getDeclaredField(savedEntry.getValue());
-                    declaredField.set(activity, inState.get(savedEntry.getKey()));
+                    declaredField.set(object, inState.get(savedEntry.getKey()));
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 }

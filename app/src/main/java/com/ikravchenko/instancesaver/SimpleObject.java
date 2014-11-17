@@ -1,4 +1,4 @@
-package com.dorma.instancesaver;
+package com.ikravchenko.instancesaver;
 
 import android.os.Parcel;
 import android.os.Parcelable;

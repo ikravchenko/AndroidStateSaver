@@ -1,4 +1,4 @@
-package com.dorma.instancesaver;
+package com.ikravchenko.instancesaver;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,8 +6,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.dorma.library.SaveState;
-import com.dorma.library.Saver;
+import com.ikravchenko.library.DefaultSaver;
+import com.ikravchenko.library.SaveState;
 
 public class MainActivity extends Activity {
 
@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        Saver.restore(this, savedInstanceState);
+        new DefaultSaver().restore(this, savedInstanceState);
         final TextView title = (TextView) findViewById(R.id.title);
         title.setText(text);
         final EditText input = (EditText) findViewById(R.id.input);
@@ -36,6 +36,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Saver.save(this, outState);
+        new DefaultSaver().save(this, outState);
     }
 }

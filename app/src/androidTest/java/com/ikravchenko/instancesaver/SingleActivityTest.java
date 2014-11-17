@@ -1,13 +1,13 @@
-package com.dorma.instancesaver;
+package com.ikravchenko.instancesaver;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class SaveTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    public SaveTest() {
+    public SingleActivityTest() {
         super(MainActivity.class);
     }
 

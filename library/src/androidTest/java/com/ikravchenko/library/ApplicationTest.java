@@ -1,4 +1,4 @@
-package com.dorma.library;
+package com.ikravchenko.library;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
