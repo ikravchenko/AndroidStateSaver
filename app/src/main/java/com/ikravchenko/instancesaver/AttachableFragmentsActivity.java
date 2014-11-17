@@ -15,7 +15,9 @@ public class AttachableFragmentsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.attachable_fragments_activity);
-        getFragmentManager().beginTransaction().replace(R.id.first, new SimpleFragment()).commit();
+        if (getFragmentManager().findFragmentById(R.id.first) == null) {
+            getFragmentManager().beginTransaction().replace(R.id.first, new SimpleFragment()).commit();
+        }
         new DefaultSaver().restore(this, savedInstanceState);
     }
 
