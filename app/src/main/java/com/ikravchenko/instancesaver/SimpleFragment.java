@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ikravchenko.library.DefaultSaver;
+import com.ikravchenko.library.Saver;
 import com.ikravchenko.library.SaveState;
 
 public class SimpleFragment extends Fragment {
@@ -17,13 +17,13 @@ public class SimpleFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new DefaultSaver().restore(this, savedInstanceState);
+        new Saver().restore(this, savedInstanceState);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        new DefaultSaver().save(this, outState);
+        new Saver().save(this, outState);
     }
 
     @Override

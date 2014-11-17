@@ -3,7 +3,7 @@ package com.ikravchenko.instancesaver;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.ikravchenko.library.DefaultSaver;
+import com.ikravchenko.library.Saver;
 import com.ikravchenko.library.SaveState;
 
 public class AttachableFragmentsActivity extends Activity {
@@ -18,12 +18,12 @@ public class AttachableFragmentsActivity extends Activity {
         if (getFragmentManager().findFragmentById(R.id.first) == null) {
             getFragmentManager().beginTransaction().replace(R.id.first, new SimpleFragment()).commit();
         }
-        new DefaultSaver().restore(this, savedInstanceState);
+        new Saver().restore(this, savedInstanceState);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        new DefaultSaver().save(this, outState);
+        new Saver().save(this, outState);
     }
 }

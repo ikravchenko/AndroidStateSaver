@@ -7,6 +7,10 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface SaveState {
-//    String id();
-}
+/**
+ * Annotates the fields that should be saved in a {@link android.app.Activity} or {@link android.app.Fragment} lifecycle
+ * throws {@link java.lang.RuntimeException} when annotating final fields.
+ *
+ * @see com.ikravchenko.library.Saver
+ */
+public @interface SaveState {}

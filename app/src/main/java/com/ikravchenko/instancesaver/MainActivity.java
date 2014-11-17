@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.ikravchenko.library.DefaultSaver;
+import com.ikravchenko.library.Saver;
 import com.ikravchenko.library.SaveState;
 
 public class MainActivity extends Activity {
@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        new DefaultSaver().restore(this, savedInstanceState);
+        new Saver().restore(this, savedInstanceState);
         final TextView title = (TextView) findViewById(R.id.title);
         title.setText(text);
         final EditText input = (EditText) findViewById(R.id.input);
@@ -36,6 +36,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        new DefaultSaver().save(this, outState);
+        new Saver().save(this, outState);
     }
 }

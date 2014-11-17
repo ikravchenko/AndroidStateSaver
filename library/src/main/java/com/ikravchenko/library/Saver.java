@@ -1,8 +1,151 @@
 package com.ikravchenko.library;
 
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.text.TextUtils;
+import android.util.Log;
 
-public interface Saver<T> {
-    void save(T object, Bundle inState);
-    void restore(T object, Bundle inState);
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * Helper class for saving {@link android.app.Activity}s and {@link android.app.Fragment}s states by putting the marked with
+ * {@link com.ikravchenko.library.SaveState} fields in the saved {@link Bundle}
+ * The annotated field should be either {@link android.os.Parcelable} (preferred Android way) or {@link java.io.Serializable}.
+ * throws {@link java.lang.RuntimeException} when trying to save final fields.
+ *
+ * Example usage:
+ * <pre>
+        public class MainActivity extends Activity {
+
+        @SaveState
+        SimpleObject simpleObject;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.main_activity);
+            new Saver().restore(this, savedInstanceState);
+            final TextView title = (TextView) findViewById(R.id.title);
+            title.setText(text);
+            final EditText input = (EditText) findViewById(R.id.input);
+            findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    text = input.getText().toString();
+                    title.setText(text);
+                    }
+                });
+        }
+
+        @Override
+        protected void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+            new Saver().save(this, outState);
+        }
+ * </pre>
+ *
+ * Possible improvements:
+ * 1. {@link android.os.Bundle} size restriction according to OS params,
+ * 2. code generation during compile phase
+ * 3. complex saving and restoring using use defined methods
+ *
+ * @see com.ikravchenko.library.SaveState
+ */
+public class Saver {
+
+    private static final String SAVED_OBJECTS_MAPPING_KEY = "SAVED_OBJECTS_MAPPING";
+
+    private HashMap<String, String> id2Name = new HashMap<String, String>();
+
+    /**
+     * Saves {@link android.app.Activity} or {@link android.app.Fragment} state into the outState
+     * @param object {@link android.app.Activity} or {@link android.app.Fragment} instance to save
+     * @param outState usually created by system {@link Bundle}. Call it in:
+     *                 {@link android.app.Activity#onSaveInstanceState(android.os.Bundle)} or
+     *                 {@link android.app.Fragment#onSaveInstanceState(android.os.Bundle)}
+     * @throws java.lang.RuntimeException in case of object or outState in {@code null} or
+     * if the field is final
+     */
+    public void save(Object object, Bundle outState) {
+        if (object == null) {
+            throw new RuntimeException("Object should not be null!");
+        }
+        if (outState == null) {
+            throw new RuntimeException("outState bundle should not be empty!");
+        }
+        Log.i("DefaultInstanceSaver", "Size: " + id2Name.size() + ", class: " + object.getClass().getSimpleName() + " " + TextUtils.join("; ",  id2Name.entrySet()));
+        id2Name.clear();
+        try {
+            Class<?> clazz = object.getClass();
+            Field[] declaredFields = clazz.getDeclaredFields();
+            for (Field field : declaredFields) {
+                if (field.isAnnotationPresent(SaveState.class)) {
+                    if (Modifier.isFinal(field.getModifiers())) {
+                        throw new RuntimeException("final field should not be annotated to save state!");
+                    }
+                    field.setAccessible(true);
+                    String id = UUID.randomUUID().toString();
+                    id2Name.put(id, field.getName());
+                    Object value = field.get(object);
+                    if (value instanceof Parcelable) {
+                        outState.putParcelable(id, (Parcelable) value);
+                    } else if (value instanceof Serializable) {
+                        outState.putSerializable(id, (Serializable) value);
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } finally {
+            if (!id2Name.isEmpty()) {
+                outState.putSerializable(SAVED_OBJECTS_MAPPING_KEY, id2Name);
+            }
+        }
+    }
+
+    /**
+     * Restores {@link android.app.Activity} or {@link android.app.Fragment} state into the inState
+     * If the inState is {@code null}, has no effect on the object
+     * @param object {@link android.app.Activity} or {@link android.app.Fragment} instance to restore
+     * @param inState usually generated by system {@link Bundle}. Call it in:
+     *                 {@link android.app.Activity#onCreate(android.os.Bundle)}, {@link android.app.Activity#onRestoreInstanceState(android.os.Bundle)} or
+     *                 {@link android.app.Fragment#onCreate(android.os.Bundle)}, {@link android.app.Fragment#onActivityCreated(android.os.Bundle)}
+     * @throws java.lang.RuntimeException in case of object is {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    public void restore(Object object, Bundle inState) {
+        if (object == null) {
+            throw new RuntimeException("Object should not be null!");
+        }
+        if (inState == null) {
+            return;
+        }
+
+        if (!inState.containsKey(SAVED_OBJECTS_MAPPING_KEY)) {
+            Log.i("Saver", "nothing was saved");
+            return;
+        }
+
+        id2Name = (HashMap<String, String>) inState.getSerializable(SAVED_OBJECTS_MAPPING_KEY);
+
+        try {
+            Class<?> clazz = object.getClass();
+            for (Map.Entry<String, String> savedEntry : id2Name.entrySet()) {
+                try {
+                    Field declaredField = clazz.getDeclaredField(savedEntry.getValue());
+                    declaredField.setAccessible(true);
+                    declaredField.set(object, inState.get(savedEntry.getKey()));
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }
