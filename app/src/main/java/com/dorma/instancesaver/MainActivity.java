@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
     @SaveState
     private String text = "";
     @SaveState
-    public SimpleObject simpleObject;
+    SimpleObject simpleObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

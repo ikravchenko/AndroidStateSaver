@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +29,9 @@ public class Saver {
             Field[] declaredFields = clazz.getDeclaredFields();
             for (Field field : declaredFields) {
                 if (field.isAnnotationPresent(SaveState.class)) {
+                    if (Modifier.isFinal(field.getModifiers())) {
+                        throw new RuntimeException("final field should not be annotated to save state!");
+                    }
                     field.setAccessible(true);
                     String id = UUID.randomUUID().toString();
                     id2Name.put(id, field.getName());
