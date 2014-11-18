@@ -1,6 +1,5 @@
 package com.ikravchenko.instancesaver;
 
-import android.app.Activity;
 import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
@@ -28,20 +27,21 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
     public void testStringCheckStateSaving() throws Throwable {
 
         final String text = "something";
-        final EditText input = (EditText) getActivity().findViewById(R.id.input);
+        final MainActivity activity = getActivity();
+        final EditText input = (EditText) activity.findViewById(R.id.input);
         mainActivityMonitor.waitForActivityWithTimeout(1000);
         runTestOnUiThread(new Runnable() {
             @Override
             public void run() {
                 input.setText(text);
-                getActivity().findViewById(R.id.submit).callOnClick();
-                getActivity().recreate();
+                activity.findViewById(R.id.submit).callOnClick();
+                activity.recreate();
             }
         });
 
         getInstrumentation().waitForIdleSync();
-        MainActivity newActivity = (MainActivity) mainActivityMonitor.getLastActivity();
-        assertEquals(text, ((TextView) newActivity.findViewById(R.id.title)).getText().toString());
+        MainActivity lastActivity = (MainActivity) mainActivityMonitor.getLastActivity();
+        assertEquals(text, ((TextView) lastActivity.findViewById(R.id.title)).getText().toString());
     }
 
     @Override
@@ -52,9 +52,9 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
     }
 
     public void testPOJOCheckStateSaving() throws Throwable {
-        final Activity activity = getActivity();
+        final MainActivity activity = getActivity();
         final SimpleObject simpleObject = new SimpleObject(1, 5, 4.0);
-        getActivity().simpleObject = simpleObject;
+        activity.simpleObject = simpleObject;
         mainActivityMonitor.waitForActivityWithTimeout(1000);
         runTestOnUiThread(new Runnable() {
             @Override
@@ -62,9 +62,9 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
                 activity.recreate();
             }
         });
-        getInstrumentation().waitForIdleSync();
 
-        MainActivity newActivity = (MainActivity) mainActivityMonitor.getLastActivity();
-        assertEquals(simpleObject, newActivity.simpleObject);
+        getInstrumentation().waitForIdleSync();
+        MainActivity lastActivity = (MainActivity) mainActivityMonitor.getLastActivity();
+        assertEquals(simpleObject, lastActivity.simpleObject);
     }
 }
