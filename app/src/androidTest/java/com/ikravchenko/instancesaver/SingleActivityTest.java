@@ -1,10 +1,14 @@
 package com.ikravchenko.instancesaver;
 
 import android.app.Instrumentation;
+import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
@@ -15,7 +19,7 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
     }
 
     @UiThreadTest
-    public void testCheckTextAssignment() {
+    public void testTextAssignment() {
         String text = "something";
         EditText input = (EditText) getActivity().findViewById(R.id.input);
         assertNotNull(input);
@@ -24,7 +28,7 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
         assertEquals(text, ((TextView) getActivity().findViewById(R.id.title)).getText());
     }
 
-    public void testStringCheckStateSaving() throws Throwable {
+    public void testStringStateSaving() throws Throwable {
 
         final String text = "something";
         final MainActivity activity = getActivity();
@@ -41,7 +45,9 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
 
         getInstrumentation().waitForIdleSync();
         MainActivity lastActivity = (MainActivity) mainActivityMonitor.getLastActivity();
-        assertEquals(text, ((TextView) lastActivity.findViewById(R.id.title)).getText().toString());
+
+        String result = ((TextView) lastActivity.findViewById(R.id.title)).getText().toString();
+        assertEquals(text, result);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
         getInstrumentation().addMonitor(mainActivityMonitor);
     }
 
-    public void testPOJOCheckStateSaving() throws Throwable {
+    public void testPOJOStateSaving() throws Throwable {
         final MainActivity activity = getActivity();
         final SimpleObject simpleObject = new SimpleObject(1, 5, 4.0);
         activity.simpleObject = simpleObject;
@@ -67,4 +73,62 @@ public class SingleActivityTest extends ActivityInstrumentationTestCase2<MainAct
         MainActivity lastActivity = (MainActivity) mainActivityMonitor.getLastActivity();
         assertEquals(simpleObject, lastActivity.simpleObject);
     }
+
+    public void testPrimitiveStateSaving() throws Throwable {
+        final MainActivity activity = getActivity();
+        final int expected = 5;
+        activity.primitive = expected;
+        mainActivityMonitor.waitForActivityWithTimeout(1000);
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.recreate();
+            }
+        });
+
+        getInstrumentation().waitForIdleSync();
+        MainActivity lastActivity = (MainActivity) mainActivityMonitor.getLastActivity();
+        assertEquals(expected, lastActivity.primitive);
+    }
+
+    public void testArrayStateSaving() throws Throwable {
+        final MainActivity activity = getActivity();
+        final int[] expected = {1, 2, 3};
+        activity.primitiveArray = expected;
+        mainActivityMonitor.waitForActivityWithTimeout(1000);
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.recreate();
+            }
+        });
+
+        getInstrumentation().waitForIdleSync();
+        MainActivity lastActivity = (MainActivity) mainActivityMonitor.getLastActivity();
+        assertEquals(expected, lastActivity.primitiveArray);
+    }
+
+    public void testParcelablesArrayListStateSaving() throws Throwable {
+        final MainActivity activity = getActivity();
+        ArrayList<Parcelable> expected = new ArrayList<Parcelable>(
+                Arrays.asList(
+                        new SimpleObject(0, 0, 0),
+                        new SimpleObject(1, 1, 1)
+                )
+        );
+        activity.parcelablesArrayList = expected;
+
+        mainActivityMonitor.waitForActivityWithTimeout(1000);
+        runTestOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.recreate();
+            }
+        });
+
+        getInstrumentation().waitForIdleSync();
+        MainActivity lastActivity = (MainActivity) mainActivityMonitor.getLastActivity();
+        assertEquals(expected, lastActivity.parcelablesArrayList);
+    }
+
 }
