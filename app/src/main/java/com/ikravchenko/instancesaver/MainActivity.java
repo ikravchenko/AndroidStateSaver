@@ -6,20 +6,20 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.ikravchenko.library.SaveState;
 import com.ikravchenko.library.Saver;
+import com.ikravchenko.library.SaveState;
 
 public class MainActivity extends Activity {
 
     @SaveState
     private String text = "";
     @SaveState
-    SimpleObject simpleObject;
+    public SimpleObject simpleObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.multiple_fragments_activity);
         new Saver().restore(this, savedInstanceState);
 
         final TextView title = (TextView) findViewById(R.id.title);
