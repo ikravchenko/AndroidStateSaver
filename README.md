@@ -41,9 +41,9 @@ Example usage:
     
  Possible improvements:
  1. {@link android.os.Bundle} size restriction according to OS params
- 2. code generation during compile phase
- 3. complex saving and restoring using use defined methods
+ 2. code generation during compile time
+ 3. complex saving and restoring using user defined methods
  4. gradle deployment script
  5. Porting to v4 support library
  
- All the contributors are welcome!
+ All contributors are welcome!
