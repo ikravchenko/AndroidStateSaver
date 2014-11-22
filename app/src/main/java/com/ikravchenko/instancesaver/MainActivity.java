@@ -14,13 +14,14 @@ public class MainActivity extends Activity {
     @SaveState
     private String text = "";
     @SaveState
-    SimpleObject simpleObject;
+    public SimpleObject simpleObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.multiple_fragments_activity);
         new Saver().restore(this, savedInstanceState);
+
         final TextView title = (TextView) findViewById(R.id.title);
         title.setText(text);
         final EditText input = (EditText) findViewById(R.id.input);
