@@ -16,42 +16,6 @@ import java.util.ArrayList;
  * The annotated field should be either {@link android.os.Parcelable} (preferred Android way) or {@link java.io.Serializable}.
  * throws {@link java.lang.RuntimeException} when trying to save final fields.
  *
- * Example usage:
- * <pre>
-        public class MainActivity extends Activity {
-
-        @SaveState
-        SimpleObject simpleObject;
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.main_activity);
-            new Saver().restore(this, savedInstanceState);
-            final TextView title = (TextView) findViewById(R.id.title);
-            title.setText(text);
-            final EditText input = (EditText) findViewById(R.id.input);
-            findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    text = input.getText().toString();
-                    title.setText(text);
-                    }
-                });
-        }
-
-        @Override
-        protected void onSaveInstanceState(Bundle outState) {
-            super.onSaveInstanceState(outState);
-            new Saver().save(this, outState);
-        }
- * </pre>
- *
- * Possible improvements:
- * 1. {@link android.os.Bundle} size restriction according to OS params,
- * 2. code generation during compile phase
- * 3. complex saving and restoring using use defined methods
- *
  * @see com.ikravchenko.library.SaveState
  */
 public class Saver {
@@ -125,6 +89,8 @@ public class Saver {
         if (inState == null) {
             return;
         }
+
+        inState.setClassLoader(getClass().getClassLoader());
 
         if (!inState.containsKey(SAVED_OBJECTS_MAPPING_KEY)) {
             Log.i(TAG, "nothing was saved");
